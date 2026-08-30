@@ -75,13 +75,18 @@ export function createScene(canvas) {
   return { scene, camera, renderer, resize, dispose };
 }
 
-/** True if this browser can create a WebGL context at all. */
+/**
+ * True if this browser can create either a modern WebGL2 context or a WebGL1
+ * context. The previous check only tested the WebGL1 constructor, which can
+ * incorrectly reject environments that expose WebGL2 without WebGL1.
+ */
 export function isWebGLAvailable() {
   try {
     const canvas = document.createElement("canvas");
     return !!(
-      window.WebGLRenderingContext &&
-      (canvas.getContext("webgl") || canvas.getContext("experimental-webgl"))
+      canvas.getContext("webgl2") ||
+      canvas.getContext("webgl") ||
+      canvas.getContext("experimental-webgl")
     );
   } catch (e) {
     return false;
