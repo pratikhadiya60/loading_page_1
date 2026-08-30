@@ -15,43 +15,14 @@
   </script>
 </head>
 <body>
-
-  <!-- Main Three.js experience. -->
+  <!-- The real Three.js loading experience. No visual fallback overlays are
+       mounted above this canvas, so the rendered maze and robot dog remain
+       the only visual experience when the renderer initializes. -->
   <div id="loader-root">
     <canvas id="loader-canvas"></canvas>
     <div id="status-hud" aria-live="polite">
       <span id="status-text">INITIALIZING</span>
     </div>
-  </div>
-
-  <!--
-    WebGL fallback. This does not replace the Three.js project: it is only used
-    when the browser cannot create any WebGL context. It keeps the same journey
-    readable instead of ending the experience on an error message.
-  -->
-  <div id="webgl-fallback" hidden>
-    <div class="fallback-world" aria-label="Robot dog navigating a maze">
-      <svg class="fallback-maze" viewBox="0 0 1000 700" role="img" aria-label="Minimal maze">
-        <rect x="70" y="70" width="860" height="560" rx="22" class="maze-base" />
-        <path d="M160 150 H720 V330 H330 V510 H850" class="maze-route" />
-        <path d="M120 110 H770 V290 H290 V550 H890" class="maze-wall wall-a" />
-        <path d="M120 190 H680 V370 H370 V470 H850" class="maze-wall wall-b" />
-        <circle cx="160" cy="150" r="12" class="start-marker" />
-        <circle cx="850" cy="510" r="16" class="goal-marker" />
-      </svg>
-
-      <div id="fallback-dog" aria-hidden="true">
-        <span class="fallback-tail"></span>
-        <span class="fallback-body"></span>
-        <span class="fallback-neck"></span>
-        <span class="fallback-head"><i></i><b></b></span>
-        <span class="fallback-leg leg-1"></span>
-        <span class="fallback-leg leg-2"></span>
-        <span class="fallback-leg leg-3"></span>
-        <span class="fallback-leg leg-4"></span>
-      </div>
-    </div>
-    <div class="fallback-status"><span id="fallback-status-text">INITIALIZING</span></div>
   </div>
 
   <script type="module" src="main.js"></script>
