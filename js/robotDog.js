@@ -170,7 +170,10 @@ export function buildRobotDog() {
   const KNEE_AMPLITUDE = 0.55;
 
   function update(dt, normalizedSpeed) {
-    elapsed += dt * normalizedSpeed;
+    // Keep a real elapsed clock running even while standing still so the
+    // documented ambient head/tail motion remains alive during the intro and
+    // final hold. Walking motion still uses normalizedSpeed for its amplitude.
+    elapsed += dt;
 
     for (const leg of legs) {
       const phase = phaseOf[leg.name];
