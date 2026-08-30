@@ -1,0 +1,13 @@
+{
+  "name": "robot-dog-maze-loading-experience",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Cinematic robot-dog maze loading experience (standalone). No build step is needed to run it - see README.md.",
+  "type": "module",
+  "scripts": {
+    "verify": "node verify_path.mjs"
+  },
+  "devDependencies": {
+    "three": "0.160.0"
+  }
+}

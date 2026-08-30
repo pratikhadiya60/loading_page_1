@@ -1,0 +1,126 @@
+:root {
+  --bg-color: #efece5;         /* off-white / light warm gray */
+  --ink-color: #2b2a27;        /* near-black text, kept soft */
+  --accent-cyan: #6fd9e0;      /* extremely subtle accent */
+  --hud-bg: rgba(255, 255, 255, 0.55);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color);
+  color: var(--ink-color);
+  font-family: -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  overflow: hidden;
+}
+
+#loader-root {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: var(--bg-color);
+  opacity: 0;
+  animation: fade-in 1s ease-out forwards;
+  animation-delay: 0.1s;
+}
+
+@keyframes fade-in {
+  to { opacity: 1; }
+}
+
+/* Applied by main.js once the dog reaches the goal */
+#loader-root.is-leaving {
+  transition: opacity 1.1s ease-in, filter 1.1s ease-in;
+  opacity: 0;
+  filter: blur(6px);
+  pointer-events: none;
+}
+
+#loader-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* Minimal status readout, bottom-center, letter-spaced, quiet */
+#status-hud {
+  position: absolute;
+  left: 50%;
+  bottom: 7%;
+  transform: translateX(-50%);
+  padding: 8px 18px;
+  border-radius: 999px;
+  background: var(--hud-bg);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+  pointer-events: none;
+}
+
+#status-text {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  font-weight: 600;
+  color: var(--ink-color);
+  opacity: 0.65;
+  transition: opacity 0.35s ease;
+}
+
+@media (max-width: 640px) {
+  #status-hud {
+    bottom: 5%;
+    padding: 6px 14px;
+  }
+  #status-text {
+    font-size: 9px;
+    letter-spacing: 0.16em;
+  }
+}
+
+#webgl-fallback {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+}
+
+.fallback-card {
+  text-align: center;
+  color: var(--ink-color);
+}
+
+.fallback-sub {
+  opacity: 0.6;
+  font-size: 0.9em;
+}
+
+#website-placeholder {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: var(--bg-color);
+  text-align: center;
+  padding: 24px;
+  opacity: 0;
+  animation: fade-in 1.2s ease-out forwards;
+}
+
+#website-placeholder code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
