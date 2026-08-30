@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { createScene, isWebGLAvailable } from "./js/scene.js";
+import { createScene } from "./js/scene.js";
 import { buildMaze } from "./js/maze.js";
 import { buildRobotDog } from "./js/robotDog.js";
 import { getWaypoints, getPathLength, sampleAlongPath } from "./js/path.js";
@@ -27,9 +27,9 @@ function fireCompletionEvent() {
   window.dispatchEvent(new CustomEvent("robotDogIntroComplete"));
 }
 
-// When WebGL is unavailable, keep the loading concept alive with a lightweight
-// CSS/SVG version rather than stopping on an error message. The 3D code and its
-// maze/path/dog architecture remain untouched for WebGL-capable browsers.
+// This fallback is now used only when creating the real Three.js renderer
+// actually fails. We do not hide the real project based on a separate
+// capability pre-check, because that check can produce false negatives.
 function showFallback() {
   document.getElementById("webgl-fallback").hidden = false;
   rootEl.hidden = true;
@@ -68,12 +68,20 @@ function showFallback() {
 }
 
 function init() {
-  if (!isWebGLAvailable()) {
+  let scene;
+  let camera;
+  let renderer;
+
+  // Always try the real Claude-generated Three.js experience first.
+  // Only fall back if renderer creation itself genuinely fails.
+  try {
+    ({ scene, camera, renderer } = createScene(canvas));
+  } catch (error) {
+    console.warn("Three.js renderer could not start. Using visual fallback.", error);
     showFallback();
     return;
   }
 
-  const { scene, camera, renderer } = createScene(canvas);
   const waypoints = getWaypoints();
   const totalLength = getPathLength(waypoints);
 
