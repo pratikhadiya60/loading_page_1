@@ -11,16 +11,16 @@ import { createCameraDirector } from "./js/animation.js";
 //   3.0s – end   NAVIGATE dog walks the path at a constant speed
 //   last 12%     APPROACH camera tightens up near the exit
 //   on arrival   ARRIVED  dog settles, brief pause
-//   +1.4s        TRANSITION fade out, dispatch robotDogIntroComplete
+//   completion   dispatch robotDogIntroComplete and keep the standalone
+//                experience visible until a future host site takes over.
 // ------------------------------------------------------------------
 
 const WALK_SPEED = 1.35; // world units / second
 const INTRO_DURATION = 3.0; // seconds
-const ARRIVAL_HOLD = 1.6; // seconds standing at the goal before transition
+const ARRIVAL_HOLD = 1.6; // seconds standing at the goal before completion
 
 const statusEl = document.getElementById("status-text");
 const rootEl = document.getElementById("loader-root");
-const placeholderEl = document.getElementById("website-placeholder");
 const canvas = document.getElementById("loader-canvas");
 
 function setStatus(text) {
@@ -40,9 +40,8 @@ function fireCompletionEvent() {
 function showFallback() {
   document.getElementById("webgl-fallback").hidden = false;
   rootEl.hidden = true;
-  // Even without WebGL, the rest of the site must still be reachable.
+  // A future host site can still react to the same completion event.
   fireCompletionEvent();
-  placeholderEl.hidden = false;
 }
 
 function init() {
@@ -51,7 +50,7 @@ function init() {
     return;
   }
 
-  const { scene, camera, renderer, dispose } = createScene(canvas);
+  const { scene, camera, renderer } = createScene(canvas);
 
   const waypoints = getWaypoints();
   const totalLength = getPathLength(waypoints);
@@ -70,7 +69,7 @@ function init() {
 
   let elapsed = 0;
   let travelled = 0;
-  let state = "intro"; // intro -> navigate -> approach -> arrived -> transitioning -> done
+  let state = "intro"; // intro -> navigate -> approach -> arrived -> complete
   let arrivalTimer = 0;
   let lastFacing = new THREE.Vector3(0, 0, 1);
   let isHidden = false;
@@ -82,7 +81,6 @@ function init() {
   const clock = new THREE.Clock();
 
   function tick() {
-    if (state === "done") return;
     requestAnimationFrame(tick);
 
     const dt = Math.min(clock.getDelta(), 1 / 30);
@@ -152,10 +150,12 @@ function init() {
       });
 
       if (arrivalTimer >= ARRIVAL_HOLD) {
-        state = "transitioning";
-        beginTransition();
+        state = "complete";
+        // The event remains available for future portfolio integration, but
+        // this standalone repository keeps its finished cinematic frame.
+        fireCompletionEvent();
       }
-    } else if (state === "transitioning") {
+    } else if (state === "complete") {
       dog.update(dt, 0);
       cameraDirector.update(dt, {
         dogPos: dog.object3D.position,
@@ -165,20 +165,6 @@ function init() {
     }
 
     renderer.render(scene, camera);
-  }
-
-  function beginTransition() {
-    rootEl.classList.add("is-leaving");
-    fireCompletionEvent();
-
-    // Give the CSS fade time to finish, then hand off to the (stand-in)
-    // website and stop the render loop / free GPU resources.
-    setTimeout(() => {
-      placeholderEl.hidden = false;
-      state = "done";
-      rootEl.hidden = true;
-      dispose();
-    }, 1200);
   }
 
   requestAnimationFrame(tick);
