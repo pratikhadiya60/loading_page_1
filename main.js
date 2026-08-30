@@ -10,7 +10,6 @@ const INTRO_DURATION = 3.0;
 const ARRIVAL_HOLD = 1.6;
 
 const statusEl = document.getElementById("status-text");
-const rootEl = document.getElementById("loader-root");
 const canvas = document.getElementById("loader-canvas");
 
 function setStatus(text) {
@@ -27,58 +26,20 @@ function fireCompletionEvent() {
   window.dispatchEvent(new CustomEvent("robotDogIntroComplete"));
 }
 
-// This fallback is now used only when creating the real Three.js renderer
-// actually fails. We do not hide the real project based on a separate
-// capability pre-check, because that check can produce false negatives.
-function showFallback() {
-  document.getElementById("webgl-fallback").hidden = false;
-  rootEl.hidden = true;
-
-  const dog = document.getElementById("fallback-dog");
-  const status = document.getElementById("fallback-status-text");
-  const start = performance.now();
-  const introMs = 2200;
-  const walkMs = 14500;
-  const holdMs = 1600;
-  let completed = false;
-
-  function fallbackTick(now) {
-    const elapsed = now - start;
-    let progress = 0;
-
-    if (elapsed < introMs) {
-      status.textContent = elapsed < 900 ? "INITIALIZING" : "CALIBRATING PATH";
-    } else if (elapsed < introMs + walkMs) {
-      progress = (elapsed - introMs) / walkMs;
-      status.textContent = progress > 0.88 ? "PREPARING PORTFOLIO" : "NAVIGATING";
-      dog.style.offsetDistance = `${progress * 100}%`;
-    } else {
-      dog.style.offsetDistance = "100%";
-      status.textContent = "ARRIVED";
-      if (!completed && elapsed >= introMs + walkMs + holdMs) {
-        completed = true;
-        fireCompletionEvent();
-      }
-    }
-
-    requestAnimationFrame(fallbackTick);
-  }
-
-  requestAnimationFrame(fallbackTick);
-}
-
 function init() {
   let scene;
   let camera;
   let renderer;
 
-  // Always try the real Claude-generated Three.js experience first.
-  // Only fall back if renderer creation itself genuinely fails.
+  // The real Three.js experience is the only visual implementation.
+  // If the renderer cannot initialize, leave the canvas in place and report
+  // the failure in the console rather than replacing the project with a
+  // separate SVG/CSS scene.
   try {
     ({ scene, camera, renderer } = createScene(canvas));
   } catch (error) {
-    console.warn("Three.js renderer could not start. Using visual fallback.", error);
-    showFallback();
+    console.error("Three.js renderer could not start.", error);
+    setStatus("RENDERER UNAVAILABLE");
     return;
   }
 
